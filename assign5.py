@@ -1,4 +1,5 @@
 """
+Juliet Smith
 For this assignment there is no automated testing. You will instead submit
 your *.py file in Canvas. I will download and test your program from Canvas.
 """
