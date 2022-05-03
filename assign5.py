@@ -4,6 +4,7 @@ For this assignment there is no automated testing. You will instead submit
 your *.py file in Canvas. I will download and test your program from Canvas.
 """
 
+from os import fork
 import time
 import sys
 import random
@@ -58,8 +59,6 @@ def TSPwGenAlgo(
     for i in range(population_size):
         population[i] = (random.sample(verts[1:], len(g)))
     
-
-
     # loop for x number of generations (can also choose to add other early-stopping criteria)
     for i in range(max_num_generations):
         # calculate fitness of each individual in the population
@@ -67,13 +66,18 @@ def TSPwGenAlgo(
         fitness = [INF]*population_size
         for j in range(population_size):
             distance = g[0][population[j][0]] + g[0][population[j][-1]]
-            print(distance)
             for k in range(len(g)-1):
                 distance += g[0][population[j][k]]
-            if(distance < )
+            if(distance < min_dist):
+                min_dist = distance
+            fitness[j] = distance        
         # calculate average path length across individuals in this generation
+        avg_path_length = 0
+        for h in range(population_size):
+            avg_path_length += fitness[h]
+        avg_path_length = avg_path_length/population_size
         # and store in avg_path_each_generation
-
+        avg_path_each_generation.append[avg_path_length]
         # select the individuals to be used to spawn the generation, then create
         # individuals of the new generation (using some form of crossover)
 
