@@ -6,6 +6,7 @@ your *.py file in Canvas. I will download and test your program from Canvas.
 
 import time
 import sys
+import random
 INF = sys.maxsize
 
 
@@ -46,15 +47,30 @@ def TSPwGenAlgo(
     solution_path = [] # list of n+1 verts representing sequence of vertices with lowest total distance found
     solution_distance = INF # distance of final solution path, note this should include edge back to starting vert
     avg_path_each_generation = [] # store average path length path across individuals in each generation
-
+    """This is where the individuals are initualized"""
     # create individual members of the population
-
+    verts = list(range(len(g)))  # this is list of vectors in g
+    verts.append(0)
+    population = [0] * population_size  #this will hold lists of randomized vectors
     # initialize individuals to an initial 'solution'
+    # This will initialize the population based on the vector list.
+    # 0 and last spot should be the same vector
+    for i in range(population_size):
+        population[i] = (random.sample(verts[1:], len(g)))
+    
+
 
     # loop for x number of generations (can also choose to add other early-stopping criteria)
-
+    for i in range(max_num_generations):
         # calculate fitness of each individual in the population
-
+        min_dist = INF
+        fitness = [INF]*population_size
+        for j in range(population_size):
+            distance = g[0][population[j][0]] + g[0][population[j][-1]]
+            print(distance)
+            for k in range(len(g)-1):
+                distance += g[0][population[j][k]]
+            if(distance < )
         # calculate average path length across individuals in this generation
         # and store in avg_path_each_generation
 
