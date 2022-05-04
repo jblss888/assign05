@@ -103,13 +103,29 @@ def TSPwGenAlgo(
             index = p * 2
             mom = breeders[p]  # insures that every breader will be used at least once
             dad = random.randint(0, len(breeders) - 1)
+            child1 = [INF] * len(mom)
+            used1 = [False] * (len(mom) + 1)
+            used1[0] = True
+            child2 = [INF] * len(mom)
+            used2 = [False] * (len(mom) + 1)
+            used2[0] = True
             # this makes sure that the mom is bred with itself
             while(dad == p):
                 dad = random.randint(0, len(breeders) - 1)
             dad = breeders[dad]
-            mom = population
-        # allow for mutations (shuold be based on mutation_rate, should not happen too often)
+            xarea = population_size // 3  # how large the cross over will be
+            xstart = population_size // 2 - 1  # where the cross over will start
+            xend = xstart  + xarea  # where the cross over ends
+            for q in range(len(mom)):
+                child1[q] = mom[q]
+                used1[child1[q]] = True
+                child2[q] = dad[q]
+                used2[child2[q]] = True
+            print(child1, used1)
+            print(child2, used2)
 
+
+        # allow for mutations (shuold be based on mutation_rate, should not happen too often)
         # ...
     # calculate and *verify* final solution
     solution_path.insert(0,0)
