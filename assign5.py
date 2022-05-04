@@ -4,7 +4,6 @@ For this assignment there is no automated testing. You will instead submit
 your *.py file in Canvas. I will download and test your program from Canvas.
 """
 
-from os import fork
 import time
 import sys
 import random
@@ -46,8 +45,9 @@ def TSPwGenAlgo(
     # RUN IN 5 MINUTES OR LESS (ON AN AVERAGE LAPTOP COMPUTER)
 
     solution_path = [] # list of n+1 verts representing sequence of vertices with lowest total distance found
+    solution_path.insert(0, 0)
     solution_distance = INF # distance of final solution path, note this should include edge back to starting vert
-    avg_path_each_generation = [] # store average path length path across individuals in each generation
+    avg_path_each_generation = [INF] * max_num_generations # store average path length path across individuals in each generation
     """This is where the individuals are initualized"""
     # create individual members of the population
     verts = list(range(len(g)))  # this is list of vectors in g
@@ -60,32 +60,63 @@ def TSPwGenAlgo(
         population[i] = (random.sample(verts[1:], len(g)))
     
     # loop for x number of generations (can also choose to add other early-stopping criteria)
+    min_dist = INF
+    
     for i in range(max_num_generations):
         # calculate fitness of each individual in the population
-        min_dist = INF
-        fitness = [INF]*population_size
+        fitness = [INF]*population_size  # this stores the distane for each individuale in tuples (distance, index in p)
         for j in range(population_size):
+            # my assumption is that the start and finish is always the first vertex
+            # this grabs the distances from the first to secound and last to first
             distance = g[0][population[j][0]] + g[0][population[j][-1]]
             for k in range(len(g)-1):
                 distance += g[0][population[j][k]]
             if(distance < min_dist):
                 min_dist = distance
-            fitness[j] = distance        
+                best_fit = j
+            fitness[j] = (distance, j)
+        solution_distance = min_dist
         # calculate average path length across individuals in this generation
         avg_path_length = 0
         for h in range(population_size):
-            avg_path_length += fitness[h]
+            dist = fitness[h]
+            avg_path_length += dist[0]
         avg_path_length = avg_path_length/population_size
         # and store in avg_path_each_generation
-        avg_path_each_generation.append[avg_path_length]
+        avg_path_each_generation[i] = avg_path_length
         # select the individuals to be used to spawn the generation, then create
+        fitness.sort()  # this sort the population bast of their distances
+        breaders = []
+        if(i < max_num_generations // 2):
+            rando = random.randint(len(breaders), len(fitness) - 1)
+            rando = fitness[rando]
+            rando = population[rando[1]]
+            breaders = fitness[0:(population_size // 2) - 1]
+            for j in range(len(breaders)):
+                temp = breaders[j]
+                breaders[j] = population[temp[1]]
+            breaders.append(rando)
+        else:
+            breaders = fitness[0:population_size // 2]
+            for j in range(len(breaders)):
+                temp = breaders[j]
+                breaders[j] = population[temp[1]]
         # individuals of the new generation (using some form of crossover)
-
+        for p in range(population_size // 2):
+            index = p * 2
+            mom = breaders[p]
+            dad = random.randint(0, len(breaders) - 1)
+            while(dad == p):
+                dad = random.randint(0, len(breaders) - 1)
+            dad = breaders[dad]
+            mom = population
         # allow for mutations (shuold be based on mutation_rate, should not happen too often)
 
         # ...
-
     # calculate and *verify* final solution
+    best_fit = fitness[0]  #since fitness is sorted, the best path is always first
+    solution_path.append(population[best_fit[1]])
+    solution_path.append(0)
 
     # update solution_path and solution_distance
 
@@ -96,6 +127,8 @@ def TSPwGenAlgo(
             'solution_distance': solution_distance,
             'evolution': avg_path_each_generation
            }
+def crossOver(mom, dad):
+    pass
 
 
 def TSPwDynProg(g):
