@@ -3,7 +3,7 @@ Juliet Smith
 For this assignment there is no automated testing. You will instead submit
 your *.py file in Canvas. I will download and test your program from Canvas.
 """
-
+import copy
 import time
 import sys
 import random
@@ -45,23 +45,19 @@ def TSPwGenAlgo(
     # RUN IN 5 MINUTES OR LESS (ON AN AVERAGE LAPTOP COMPUTER)
 
     solution_path = [] # list of n+1 verts representing sequence of vertices with lowest total distance found
-    solution_path.insert(0, 0)
     solution_distance = INF # distance of final solution path, note this should include edge back to starting vert
     avg_path_each_generation = [INF] * max_num_generations # store average path length path across individuals in each generation
     """This is where the individuals are initualized"""
     # create individual members of the population
     verts = list(range(len(g)))  # this is list of vectors in g
-    verts.append(0)
-    population = [0] * population_size  #this will hold lists of randomized vectors
+    population = [0] * population_size # this will hold lists of randomized vectors
     # initialize individuals to an initial 'solution'
     # This will initialize the population based on the vector list.
     # 0 and last spot should be the same vector
     for i in range(population_size):
-        population[i] = (random.sample(verts[1:], len(g)))
-    
+        population[i] = (random.sample(verts[1:], len(verts) - 1))
     # loop for x number of generations (can also choose to add other early-stopping criteria)
     min_dist = INF
-    
     for i in range(max_num_generations):
         # calculate fitness of each individual in the population
         fitness = [INF]*population_size  # this stores the distane for each individuale in tuples (distance, index in p)
@@ -72,8 +68,9 @@ def TSPwGenAlgo(
             for k in range(len(g)-1):
                 distance += g[0][population[j][k]]
             if(distance < min_dist):
+                # this isnures that the best solution though all generations is kept
                 min_dist = distance
-                best_fit = j
+                solution_path = copy.deepcopy(population[j])
             fitness[j] = (distance, j)
         solution_distance = min_dist
         # calculate average path length across individuals in this generation
@@ -114,8 +111,7 @@ def TSPwGenAlgo(
 
         # ...
     # calculate and *verify* final solution
-    best_fit = fitness[0]  #since fitness is sorted, the best path is always first
-    solution_path.append(population[best_fit[1]])
+    solution_path.insert(0,0)
     solution_path.append(0)
 
     # update solution_path and solution_distance
