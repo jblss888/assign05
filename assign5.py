@@ -3,6 +3,8 @@ Juliet Smith
 For this assignment there is no automated testing. You will instead submit
 your *.py file in Canvas. I will download and test your program from Canvas.
 """
+# import copy will help insure that I don't lose the information of my breaders
+# when i'm making the new generation
 import copy
 import time
 import sys
@@ -99,8 +101,9 @@ def TSPwGenAlgo(
                 temp = breeders[j]
                 breeders[j] = population[temp[1]]
         # individuals of the new generation (using some form of crossover)
+        # since i'm making two children from each pair, only running though at half time
         for p in range(population_size // 2):
-            index = p * 2
+            index = p * 2  # child1 placed @ population[index], child2 = population[index + 1]
             mom = breeders[p]  # insures that every breader will be used at least once
             dad = random.randint(0, len(breeders) - 1)
             child1 = [INF] * len(mom)
