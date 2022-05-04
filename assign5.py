@@ -82,30 +82,31 @@ def TSPwGenAlgo(
         # and store in avg_path_each_generation
         avg_path_each_generation[i] = avg_path_length
         # select the individuals to be used to spawn the generation, then create
-        fitness.sort()  # this sort the population bast of their distances
-        breaders = []
+        fitness.sort()  # this sorts the population based on their distances/fitness
+        breeders = []  # will store half the population to reproduce
         if(i < max_num_generations // 2):
-            rando = random.randint(len(breaders), len(fitness) - 1)
+            rando = random.randint(len(breeders), len(fitness) - 1)
             rando = fitness[rando]
-            rando = population[rando[1]]
-            breaders = fitness[0:(population_size // 2) - 1]
-            for j in range(len(breaders)):
-                temp = breaders[j]
-                breaders[j] = population[temp[1]]
-            breaders.append(rando)
+            rando = copy.deepcopy(population[rando[1]])
+            breeders = fitness[0:(population_size // 2) - 1]
+            for j in range(len(breeders)):
+                temp = breeders[j]
+                breeders[j] = copy.deepcopy(population[temp[1]])
+            breeders.append(rando)
         else:
-            breaders = fitness[0:population_size // 2]
-            for j in range(len(breaders)):
-                temp = breaders[j]
-                breaders[j] = population[temp[1]]
+            breeders = fitness[0:population_size // 2]
+            for j in range(len(breeders)):
+                temp = breeders[j]
+                breeders[j] = population[temp[1]]
         # individuals of the new generation (using some form of crossover)
         for p in range(population_size // 2):
             index = p * 2
-            mom = breaders[p]
-            dad = random.randint(0, len(breaders) - 1)
+            mom = breeders[p]  # insures that every breader will be used at least once
+            dad = random.randint(0, len(breeders) - 1)
+            # this makes sure that the mom is bred with itself
             while(dad == p):
-                dad = random.randint(0, len(breaders) - 1)
-            dad = breaders[dad]
+                dad = random.randint(0, len(breeders) - 1)
+            dad = breeders[dad]
             mom = population
         # allow for mutations (shuold be based on mutation_rate, should not happen too often)
 
