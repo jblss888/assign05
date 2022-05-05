@@ -6,6 +6,9 @@ your *.py file in Canvas. I will download and test your program from Canvas.
 # import copy will help insure that I don't lose the information of my breaders
 # when i'm making the new generation
 import copy
+from logging import PlaceHolder
+from re import A
+from stringprep import in_table_a1
 import time
 import sys
 import random
@@ -33,9 +36,8 @@ def adjMatFromFile(filename):
     return adjmat
 
 
-def TSPwGenAlgo(
-        g,
-        max_num_generations=5,
+def TSPwGenAlgo(g,
+        max_num_generations= 20,
         population_size=10,
         mutation_rate=0.01,
         explore_rate=0.5
@@ -45,7 +47,12 @@ def TSPwGenAlgo(
     # NOTE: YOU SHOULD CHANGE THE DEFAULT PARAMETER VALUES ABOVE TO VALUES YOU
     # THINK WILL YIELD THE BEST SOLUTION FOR A GRAPH OF ~100 VERTS AND THAT CAN
     # RUN IN 5 MINUTES OR LESS (ON AN AVERAGE LAPTOP COMPUTER)
-
+    multiplier = 0
+    while(mutation_rate < 1):
+        mutation_rate = mutation_rate * 10
+        multiplier += 1
+    mutation_rate = (10 ** multiplier)
+    start_time = time.time()
     solution_path = [] # list of n+1 verts representing sequence of vertices with lowest total distance found
     solution_distance = INF # distance of final solution path, note this should include edge back to starting vert
     avg_path_each_generation = [INF] * max_num_generations # store average path length path across individuals in each generation
@@ -60,7 +67,11 @@ def TSPwGenAlgo(
         population[i] = (random.sample(verts[1:], len(verts) - 1))
     # loop for x number of generations (can also choose to add other early-stopping criteria)
     min_dist = INF
-    for i in range(max_num_generations):
+    i = 0
+    elapsed_time = start_time - time.time()
+    five_minutes = 5 * 60
+    while (i < max_num_generations) and (elapsed_time < five_minutes):
+        print("current solution distance", solution_distance, i)
         # calculate fitness of each individual in the population
         fitness = [INF]*population_size  # this stores the distane for each individuale in tuples (distance, index in p)
         for j in range(population_size):
@@ -116,18 +127,46 @@ def TSPwGenAlgo(
             while(dad == p):
                 dad = random.randint(0, len(breeders) - 1)
             dad = breeders[dad]
-            xarea = population_size // 3  # how large the cross over will be
-            xstart = population_size // 2 - 1  # where the cross over will start
-            xend = xstart  + xarea  # where the cross over ends
-            for q in range(len(mom)):
+            xarea = len(mom) // 3  # how large the cross over will be
+            visted1 = 0
+            visted2 = 0
+            # this gets the cross over genes, always from the beggining
+            for q in range(xarea):
                 child1[q] = mom[q]
                 used1[child1[q]] = True
                 child2[q] = dad[q]
                 used2[child2[q]] = True
-            print(child1, used1)
-            print(child2, used2)
-
-
+                visted1 += 1
+                visted2 += 1
+            x1 = 0
+            # this finishes child1 with the dad's genes in order as much as possible
+            while(visted1 < len(mom)):
+                if(x1 == len(mom)):
+                    x1 = 0
+                temp = dad[x1]
+                if(used1[temp] == False):
+                    child1[visted1] = dad[x1]
+                    visted1 += 1
+                x1 += 1
+            # this finishes child2 with the mom's genes in order as much as possible
+            x2 = 0
+            while(visted2 < len(mom)):
+                if(x2 == len(mom)):
+                    x2 = 0
+                if(used2[mom[x2]] == False):
+                    child2[visted2] = mom[x2]
+                    visted2 += 1
+                x2 += 1
+            mutate = random.randint(0, mutation_rate)
+            mutator = 8
+            if(mutate == mutator):
+                rando = random.randint(0, len(mom) -1)
+                child1[-1], child1[rando] = child1[rando], child1[-1]
+                child2[-1], child2[rando] = child2[rando], child2[-1]
+                print("mutation happedned!")
+            population[p] = child1
+            population[p + 1] = child2
+        i += 1
         # allow for mutations (shuold be based on mutation_rate, should not happen too often)
         # ...
     # calculate and *verify* final solution
@@ -138,14 +177,12 @@ def TSPwGenAlgo(
 
     # ...
 
+    elapsed_time = start_time - time.time()
     return {
             'solution_path': solution_path,
             'solution_distance': solution_distance,
             'evolution': avg_path_each_generation
            }
-def crossOver(mom, dad):
-    pass
-
 
 def TSPwDynProg(g):
     """ (10pts extra credit) A dynamic programming approach to solve TSP """
