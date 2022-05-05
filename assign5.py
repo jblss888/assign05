@@ -36,8 +36,8 @@ def adjMatFromFile(filename):
 
 def TSPwGenAlgo(g,
         max_num_generations= 100000,
-        population_size = 20,
-        mutation_rate = 0.1,
+        population_size = 30,
+        mutation_rate = 0.9,
         explore_rate = 0.5
     ):
     """ A genetic algorithm to attempt to find an optimal solution to TSP  """
@@ -46,12 +46,8 @@ def TSPwGenAlgo(g,
     # THINK WILL YIELD THE BEST SOLUTION FOR A GRAPH OF ~100 VERTS AND THAT CAN
     # RUN IN 5 MINUTES OR LESS (ON AN AVERAGE LAPTOP COMPUTER)
     total_mutations = 0
-    multiplier = 0
+    mutation_rate = mutation_rate * 100
     explore_rate = max_num_generations * explore_rate
-    while(mutation_rate < 1):
-        mutation_rate = mutation_rate * 10
-        multiplier += 1
-    mutation_rate = (10 ** multiplier)
     start_time = time.time()
     solution_path = [] # list of n+1 verts representing sequence of vertices with lowest total distance found
     solution_distance = INF # distance of final solution path, note this should include edge back to starting vert
@@ -83,10 +79,12 @@ def TSPwGenAlgo(g,
                 # this isnures that the best solution though all generations is kept
                 min_dist = distance
                 solution_path = copy.deepcopy(population[j])
-                print("current solution distance:", min_dist)
-                print("Generation it was found in:", i)
+                # this was used to test efficiency of my algorithm
+                print("current solution distance:", min_dist,"Generation it was found in:", i, time.time() - start_time)
             fitness[j] = (distance, j)
+        elapsed_time = time.time() - start_time
         solution_distance = min_dist
+        # print("current best: ", fitness[0])
         # calculate average path length across individuals in this generation
         avg_path_length = 0
         for h in range(population_size):
@@ -158,40 +156,35 @@ def TSPwGenAlgo(g,
                     child2[visted2] = mom[x2]
                     visted2 += 1
                 x2 += 1
-            mutate = random.randint(0, mutation_rate)
-            mutator = 8
-            if(mutate == mutator):
+            mutate = random.randint(0, 100)
+            if(mutate <= mutation_rate):
                 rando = random.randint(0, len(mom) -1)
-                child1[0], child1[rando] = child1[rando], child1[-1]
-                child2[0], child2[rando] = child2[rando], child2[-1]
+                child1[0], child1[rando] = child1[rando], child1[0]
+                child2[0], child2[rando] = child2[rando], child2[0]
                 total_mutations += 1
                 # print("mutation happedned!")
             population[p] = child1
             population[p + 1] = child2
         i += 1
-        elapsed_time = start_time - time.time()
+        elapsed_time = time.time() - start_time
         # allow for mutations (shuold be based on mutation_rate, should not happen too often)
         # ...
     # calculate and *verify* final solution
     solution_path.insert(0,0)
     solution_path.append(0)
-
-    # update solution_path and solution_distance
-
-    # ...
-
-    print("total mutations: ", total_mutations)
+    # print("total mutations: ", total_mutations)
+   
     return {
             'solution_path': solution_path,
             'solution_distance': solution_distance,
             'evolution': avg_path_each_generation
            }
 
+
 def TSPwDynProg(g):
     """ (10pts extra credit) A dynamic programming approach to solve TSP """
     solution_path = [] # list of n+1 verts representing sequence of vertices with lowest total distance found
     solution_distance = INF # distance of solution path, note this should include edge back to starting vert
-
     #...
 
     return {
