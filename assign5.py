@@ -4,10 +4,8 @@ For this assignment there is no automated testing. You will instead submit
 your *.py file in Canvas. I will download and test your program from Canvas.
 """
 # import copy will help insure that I don't lose the information of my breaders
-# when i'm making the new generation
+# when I'm making the new generation
 import copy
-from logging import PlaceHolder
-from re import A
 from stringprep import in_table_a1
 import time
 import sys
@@ -37,17 +35,19 @@ def adjMatFromFile(filename):
 
 
 def TSPwGenAlgo(g,
-        max_num_generations= 20,
-        population_size=10,
-        mutation_rate=0.01,
-        explore_rate=0.5
+        max_num_generations= 100000,
+        population_size = 20,
+        mutation_rate = 0.1,
+        explore_rate = 0.5
     ):
     """ A genetic algorithm to attempt to find an optimal solution to TSP  """
 
     # NOTE: YOU SHOULD CHANGE THE DEFAULT PARAMETER VALUES ABOVE TO VALUES YOU
     # THINK WILL YIELD THE BEST SOLUTION FOR A GRAPH OF ~100 VERTS AND THAT CAN
     # RUN IN 5 MINUTES OR LESS (ON AN AVERAGE LAPTOP COMPUTER)
+    total_mutations = 0
     multiplier = 0
+    explore_rate = max_num_generations * explore_rate
     while(mutation_rate < 1):
         mutation_rate = mutation_rate * 10
         multiplier += 1
@@ -71,7 +71,6 @@ def TSPwGenAlgo(g,
     elapsed_time = start_time - time.time()
     five_minutes = 5 * 60
     while (i < max_num_generations) and (elapsed_time < five_minutes):
-        print("current solution distance", solution_distance, i)
         # calculate fitness of each individual in the population
         fitness = [INF]*population_size  # this stores the distane for each individuale in tuples (distance, index in p)
         for j in range(population_size):
@@ -84,6 +83,8 @@ def TSPwGenAlgo(g,
                 # this isnures that the best solution though all generations is kept
                 min_dist = distance
                 solution_path = copy.deepcopy(population[j])
+                print("current solution distance:", min_dist)
+                print("Generation it was found in:", i)
             fitness[j] = (distance, j)
         solution_distance = min_dist
         # calculate average path length across individuals in this generation
@@ -97,7 +98,7 @@ def TSPwGenAlgo(g,
         # select the individuals to be used to spawn the generation, then create
         fitness.sort()  # this sorts the population based on their distances/fitness
         breeders = []  # will store half the population to reproduce
-        if(i < max_num_generations // 2):
+        if(i < explore_rate):
             rando = random.randint(len(breeders), len(fitness) - 1)
             rando = fitness[rando]
             rando = copy.deepcopy(population[rando[1]])
@@ -161,12 +162,14 @@ def TSPwGenAlgo(g,
             mutator = 8
             if(mutate == mutator):
                 rando = random.randint(0, len(mom) -1)
-                child1[-1], child1[rando] = child1[rando], child1[-1]
-                child2[-1], child2[rando] = child2[rando], child2[-1]
-                print("mutation happedned!")
+                child1[0], child1[rando] = child1[rando], child1[-1]
+                child2[0], child2[rando] = child2[rando], child2[-1]
+                total_mutations += 1
+                # print("mutation happedned!")
             population[p] = child1
             population[p + 1] = child2
         i += 1
+        elapsed_time = start_time - time.time()
         # allow for mutations (shuold be based on mutation_rate, should not happen too often)
         # ...
     # calculate and *verify* final solution
@@ -177,7 +180,7 @@ def TSPwGenAlgo(g,
 
     # ...
 
-    elapsed_time = start_time - time.time()
+    print("total mutations: ", total_mutations)
     return {
             'solution_path': solution_path,
             'solution_distance': solution_distance,
@@ -212,7 +215,7 @@ def TSPwBandB(g):
 
 def assign05_main():
     """ Load the graph (change the filename when you're ready to test larger ones) """
-    g = adjMatFromFile("complete_graph_n08.txt")
+    g = adjMatFromFile("complete_graph_n100.txt")
 
     # Run genetic algorithm to find best solution possible
     start_time = time.time()
