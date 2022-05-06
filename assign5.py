@@ -80,7 +80,7 @@ def TSPwGenAlgo(g,
                 min_dist = distance
                 solution_path = copy.deepcopy(population[j])
                 # this was used to test efficiency of my algorithm
-                print("current solution distance:", min_dist,"Generation it was found in:", i, time.time() - start_time)
+                print("Current solution distance: ", min_dist, ".", "Generation it was found in:", i, time.time() - start_time)
             fitness[j] = (distance, j)
         elapsed_time = time.time() - start_time
         solution_distance = min_dist
@@ -191,7 +191,6 @@ def TSPwDynProg(g):
             'solution_path': solution_path,
             'solution_distance': solution_distance,
            }
-
 
 def TSPwBandB(g):
     """ (10pts extra credit) A branch and bound approach to solve TSP """
